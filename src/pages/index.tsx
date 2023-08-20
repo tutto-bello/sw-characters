@@ -5,8 +5,8 @@ import LayoutComponent from "../component/layout/layout-component";
 import LoaderComponent from "../component/loader-component";
 import SortComponent from "../component/sort-component";
 import SearchComponent from "../component/search-component";
-import { fetchData, searchCharacters } from "./api/characters-service";
-import { IPeople, SortTypeOptions } from "./api/types";
+import { fetchData, searchCharacters } from "../characters-service";
+import { IPeople, SortTypeOptions } from "../types";
 
 export default function Home() {
   const [isLoading, setLoading] = useState(false);
@@ -53,7 +53,7 @@ export default function Home() {
     if (searchQuery.trim() === "") {
       fetchData().then((data) => {
         if (data) {
-          setVisibleCount(data.results.length > 4 ? 4 : data.results.length);
+          setVisibleCount(Math.min(data.results.length, 4));
           setCharacters(data.results);
           setSortedCharacters(data.results);
           setLoading(false);
@@ -64,7 +64,7 @@ export default function Home() {
     try {
       searchCharacters(searchQuery).then((data) => {
         if (data) {
-          setVisibleCount(data.results.length > 4 ? 4 : data.results.length);
+          setVisibleCount(Math.min(data.results.length, 4));
           setCharacters(data.results);
           setSortedCharacters(data.results);
           setLoading(false);
@@ -99,9 +99,8 @@ export default function Home() {
         setSortOption={setSortOption}
         sortCharacters={sortCharacters}
       />
-      {isLoading ? (
-        <LoaderComponent />
-      ) : (
+      {isLoading && <LoaderComponent />}
+      {!isLoading && sortedCharacters.length > 0 && (
         <Box display="flex" flexWrap="wrap" justifyContent="center">
           {sortedCharacters.slice(0, visibleCount).map((character, i) => (
             <CardComponent
@@ -110,6 +109,11 @@ export default function Home() {
               index={i}
             />
           ))}
+        </Box>
+      )}
+      {!isLoading && sortedCharacters.length === 0 && (
+        <Box display="flex" flexWrap="wrap" justifyContent="center">
+          <Typography variant="h6">No Results Match Your Search!</Typography>
         </Box>
       )}
       {visibleCount < sortedCharacters.length && (

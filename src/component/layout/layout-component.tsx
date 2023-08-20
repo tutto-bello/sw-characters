@@ -1,7 +1,7 @@
 import React from "react";
 import HeaderComponent from "./header-component";
 import FooterComponent from "./footer-component";
-import { Container } from "@mui/material";
+import { Container, Box } from "@mui/material";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -12,7 +12,7 @@ const LayoutComponent = (props: LayoutProps) => {
   return (
     <Container sx={{ maxWidth: "1440px" }}>
       <HeaderComponent />
-      {children}
+      <Box mt={10}>{children}</Box>
       <FooterComponent />
     </Container>
   );

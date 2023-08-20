@@ -104,7 +104,7 @@ export interface IVehicle {
   vehicle_class: string;
 }
 
-export interface FetchDataTpye {
+export interface FetchDataType {
   count: number;
   next: string;
   previous: string;

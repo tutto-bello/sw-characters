@@ -3,7 +3,7 @@ import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import Typography from "@mui/material/Typography";
-import { IPeople } from "../pages/api/types";
+import { IPeople } from "../types";
 import Image from "next/image";
 
 interface CardComponentProps {

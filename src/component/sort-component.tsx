@@ -7,7 +7,7 @@ import {
   SelectChangeEvent,
 } from "@mui/material";
 import React, { SetStateAction } from "react";
-import { IPeople, SortTypeOptions, sortOptions } from "../pages/api/types";
+import { IPeople, SortTypeOptions, sortOptions } from "../types";
 
 interface SortComponentProps {
   characters: IPeople[];
@@ -28,24 +28,27 @@ const SortComponent = (props: SortComponentProps) => {
 
   return (
     <Box padding={2}>
-      <FormControl disabled={characters.length < 2} variant="standard">
-        <InputLabel>Sort by</InputLabel>
-        <Select
-          value={sortOption}
-          onChange={handleSortChange}
-          sx={{ backgroundColor: "white", width: "100px" }}
-          displayEmpty
-        >
-          <MenuItem value="" disabled>
-            Sort by
+      {/* <FormControl disabled={characters.length < 2} variant="standard">
+        <InputLabel>Sort by</InputLabel> */}
+      <Select
+        value={sortOption}
+        onChange={handleSortChange}
+        sx={{ width: "100px" }}
+        displayEmpty
+        label="Sort by"
+        variant="standard"
+        placeholder="Sort by"
+      >
+        <MenuItem value="" disabled>
+          Sort by
+        </MenuItem>
+        {sortOptions.map((option) => (
+          <MenuItem key={option} value={option}>
+            {option}
           </MenuItem>
-          {sortOptions.map((option) => (
-            <MenuItem key={option} value={option}>
-              {option}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
+        ))}
+      </Select>
+      {/* </FormControl> */}
     </Box>
   );
 };
