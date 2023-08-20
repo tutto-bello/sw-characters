@@ -11,6 +11,14 @@ interface SearchComponentProps {
 const SearchComponent = (props: SearchComponentProps) => {
   const { isLoading, searchQuery, setSearchQuery, handleSearch } = props;
 
+  // Better User experience if press Enter start the search!
+  const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      handleSearch();
+    }
+  };
+
   return (
     <Box display="flex" flexDirection="column" alignItems="center">
       <FormControl
@@ -31,13 +39,14 @@ const SearchComponent = (props: SearchComponentProps) => {
           variant="standard"
           value={searchQuery}
           onChange={(event) => setSearchQuery(event.target.value)}
+          onKeyDown={handleKeyPress}
           sx={{
             "& label": {
               color: "white",
             },
             input: {
-              color: "#ffffff",
-              borderBottom: "1px solid #ffffff",
+              color: "white",
+              borderBottom: "1px solid white",
             },
           }}
         />
@@ -48,7 +57,7 @@ const SearchComponent = (props: SearchComponentProps) => {
         color="primary"
         disabled={isLoading}
       >
-        Search character
+        {isLoading ? "Searching..." : "Search character"}
       </Button>
     </Box>
   );

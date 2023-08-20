@@ -1,21 +1,17 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
+import { Box, Button, Typography } from "@mui/material";
 import CardComponent from "../component/card-component";
 import LayoutComponent from "../component/layout/layout-component";
-import { fetchData, searchCharacters } from "./api/characters-service";
-import { IPeople, SortTypeOptions } from "./api/types";
 import LoaderComponent from "../component/loader-component";
-import { Box, Button, Typography } from "@mui/material";
 import SortComponent from "../component/sort-component";
 import SearchComponent from "../component/search-component";
+import { fetchData, searchCharacters } from "./api/characters-service";
+import { IPeople, SortTypeOptions } from "./api/types";
 
 export default function Home() {
   const [isLoading, setLoading] = useState(false);
-  const [characters, setCharacters] = useState<IPeople[] | undefined>(
-    undefined
-  );
-  const [sortedCharacters, setSrotedCharacters] = useState<
-    IPeople[] | undefined
-  >(undefined);
+  const [characters, setCharacters] = useState<IPeople[]>([]);
+  const [sortedCharacters, setSortedCharacters] = useState<IPeople[]>([]);
   const [sortOption, setSortOption] = useState<SortTypeOptions>("");
   const [visibleCount, setVisibleCount] = useState<number>(4);
   const [searchQuery, setSearchQuery] = useState<string>("");
@@ -24,22 +20,16 @@ export default function Home() {
     setLoading(true);
     fetchData()
       .then((data) => {
-        setCharacters(data?.results);
-        setSrotedCharacters(data?.results);
+        if (data) {
+          setCharacters(data.results);
+          setSortedCharacters(data.results);
+        }
       })
       .finally(() => setLoading(false));
   }, []);
 
-  if (!characters || !sortedCharacters) {
-    return (
-      <LayoutComponent>
-        <LoaderComponent />
-      </LayoutComponent>
-    );
-  }
-
   const sortCharacters = (option: SortTypeOptions) => {
-    let sortedCharacters = [...characters];
+    let sortedCharacters: IPeople[] = [...characters];
 
     if (option === "A-Z") {
       sortedCharacters.sort((a, b) => a.name.localeCompare(b.name));
@@ -55,7 +45,7 @@ export default function Home() {
       );
     }
     setVisibleCount(sortedCharacters.length > 4 ? 4 : sortedCharacters.length);
-    setSrotedCharacters(sortedCharacters);
+    setSortedCharacters(sortedCharacters);
   };
 
   const handleSearch = async () => {
@@ -65,7 +55,7 @@ export default function Home() {
         if (data) {
           setVisibleCount(data.results.length > 4 ? 4 : data.results.length);
           setCharacters(data.results);
-          setSrotedCharacters(data.results);
+          setSortedCharacters(data.results);
           setLoading(false);
         }
       });
@@ -76,7 +66,7 @@ export default function Home() {
         if (data) {
           setVisibleCount(data.results.length > 4 ? 4 : data.results.length);
           setCharacters(data.results);
-          setSrotedCharacters(data.results);
+          setSortedCharacters(data.results);
           setLoading(false);
         }
       });
@@ -88,9 +78,7 @@ export default function Home() {
 
   const handleLoadMore = () => {
     setVisibleCount((prevVisibleCount) =>
-      !(prevVisibleCount + 4 > sortedCharacters.length)
-        ? prevVisibleCount + 4
-        : sortedCharacters.length
+      Math.min(prevVisibleCount + 4, sortedCharacters.length)
     );
   };
 
@@ -131,6 +119,7 @@ export default function Home() {
             variant="contained"
             color="primary"
             sx={{ width: "100%" }}
+            disabled={isLoading}
           >
             Load More
           </Button>

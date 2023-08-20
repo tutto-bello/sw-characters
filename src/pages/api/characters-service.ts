@@ -15,7 +15,6 @@ export const fetchData = async (): Promise<FetchDataTpye | undefined> => {
 export const searchCharacters = async (
   searchQuery: string
 ): Promise<FetchDataTpye | undefined> => {
-  console.log(apiUrl);
   try {
     const response = await axios.get(apiUrl + `?search=${searchQuery}`);
     return response.data;

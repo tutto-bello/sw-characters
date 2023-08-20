@@ -1,10 +1,10 @@
-import * as React from "react";
+import React from "react";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 
 const HeaderComponent = () => {
   return (
-    <Toolbar sx={{ borderBottom: 1, borderColor: "divider" }}>
+    <Toolbar sx={{ border: 1, borderColor: "white", margin: 2 }}>
       <Typography
         component="h2"
         variant="h5"

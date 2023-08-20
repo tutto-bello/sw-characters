@@ -28,13 +28,17 @@ const SortComponent = (props: SortComponentProps) => {
 
   return (
     <Box padding={2}>
-      <FormControl disabled={characters.length < 2}>
+      <FormControl disabled={characters.length < 2} variant="standard">
         <InputLabel>Sort by</InputLabel>
         <Select
           value={sortOption}
           onChange={handleSortChange}
           sx={{ backgroundColor: "white", width: "100px" }}
+          displayEmpty
         >
+          <MenuItem value="" disabled>
+            Sort by
+          </MenuItem>
           {sortOptions.map((option) => (
             <MenuItem key={option} value={option}>
               {option}
