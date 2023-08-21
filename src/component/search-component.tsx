@@ -11,7 +11,7 @@ interface SearchComponentProps {
 const SearchComponent = (props: SearchComponentProps) => {
   const { isLoading, searchQuery, setSearchQuery, handleSearch } = props;
 
-  // Better User experience if press Enter start the search!
+  // For better User experience if press Enter start the search!
   const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Enter") {
       event.preventDefault();

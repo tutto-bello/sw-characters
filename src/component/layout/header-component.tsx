@@ -1,13 +1,13 @@
 import React from "react";
-import { AppBar, Container, Typography } from "@mui/material";
+import { AppBar, Container, Typography, useMediaQuery } from "@mui/material";
 
 const HeaderComponent = () => {
+  const matches = useMediaQuery("(min-width:600px)");
   return (
     <AppBar>
       <Container sx={{ padding: 2 }}>
         <Typography
-          component="h2"
-          variant="h5"
+          variant={matches ? "h5" : "h6"}
           color="inherit"
           noWrap
           sx={{ flex: 1 }}

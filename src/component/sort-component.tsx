@@ -3,6 +3,7 @@ import React, { SetStateAction } from "react";
 import { IPeople, SortTypeOptions, sortOptions } from "../types";
 
 interface SortComponentProps {
+  isLoading: boolean;
   characters: IPeople[];
   sortOption: string | undefined;
   setSortOption: (value: SetStateAction<string>) => void;
@@ -10,7 +11,7 @@ interface SortComponentProps {
 }
 
 const SortComponent = (props: SortComponentProps) => {
-  const { characters, sortOption, setSortOption, sortCharacters } = props;
+  const { isLoading, sortOption, setSortOption, sortCharacters } = props;
 
   const handleSortChange:
     | ((event: SelectChangeEvent<string>, child: React.ReactNode) => void)
@@ -29,6 +30,7 @@ const SortComponent = (props: SortComponentProps) => {
         label="Sort by"
         variant="standard"
         placeholder="Sort by"
+        disabled={isLoading}
       >
         <MenuItem value="" disabled>
           Sort by

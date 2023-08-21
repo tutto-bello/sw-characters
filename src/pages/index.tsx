@@ -6,11 +6,11 @@ import LoaderComponent from "../component/loader-component";
 import SortComponent from "../component/sort-component";
 import SearchComponent from "../component/search-component";
 import {
-  fetcNextPage,
+  fetchNextPage,
   fetchData,
   searchCharacters,
 } from "../characters-service";
-import { IPeople, SortTypeOptions } from "../types";
+import { FetchDataType, IPeople, SortTypeOptions } from "../types";
 
 export default function Home() {
   const [isLoading, setLoading] = useState(false);
@@ -24,15 +24,19 @@ export default function Home() {
   const [visibleCount, setVisibleCount] = useState<number>(5);
   const [searchQuery, setSearchQuery] = useState<string>("");
 
+  const updateStates = (data: FetchDataType) => {
+    setCharacters(data.results);
+    setSortedCharacters(data.results);
+    setCount(data.count);
+    setNextUrl(data.next);
+  };
+
   useEffect(() => {
     setLoading(true);
     fetchData()
       .then((data) => {
         if (data) {
-          setCharacters(data.results);
-          setSortedCharacters(data.results);
-          setCount(data.count);
-          setNextUrl(data.next);
+          updateStates(data);
         }
       })
       .finally(() => setLoading(false));
@@ -69,10 +73,7 @@ export default function Home() {
       fetchData().then((data) => {
         if (data) {
           setVisibleCount(Math.min(data.results.length, 5));
-          setCharacters(data.results);
-          setSortedCharacters(data.results);
-          setCount(data.count);
-          setNextUrl(data.next);
+          updateStates(data);
           setLoading(false);
         }
       });
@@ -82,10 +83,7 @@ export default function Home() {
       searchCharacters(searchQuery).then((data) => {
         if (data) {
           setVisibleCount(Math.min(data.results.length, 5));
-          setCharacters(data.results);
-          setSortedCharacters(data.results);
-          setCount(data.count);
-          setNextUrl(data.next);
+          updateStates(data);
           setLoading(false);
         }
       });
@@ -104,7 +102,7 @@ export default function Home() {
 
       if (count > 10 && nextUrl && visibleCount % 10 == 0) {
         setMoreLoading(true);
-        fetcNextPage(nextUrl).then((data) => {
+        fetchNextPage(nextUrl).then((data) => {
           if (data) {
             setCharacters((prevCharacters) => [
               ...prevCharacters,
@@ -129,16 +127,18 @@ export default function Home() {
   return (
     <LayoutComponent>
       <SearchComponent
-        isLoading={isLoading}
+        isLoading={isLoading || isMoreLoading}
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
         handleSearch={handleSearch}
       />
+
       {isLoading && (
         <Box paddingLeft={2}>
           <Skeleton height={64} width={240} />
         </Box>
       )}
+
       {count! > 0 && !isLoading && (
         <Typography color="white" variant="h6" padding={2}>
           {`Showing ${visibleCount} result of ${
@@ -149,18 +149,23 @@ export default function Home() {
           }`}
         </Typography>
       )}
+
       {count === 0 && !isLoading && (
         <Typography color="white" variant="h6" padding={2}>
           Showing 0 result of 0
         </Typography>
       )}
+
       <SortComponent
+        isLoading={isLoading || isMoreLoading}
         characters={characters}
         sortOption={sortOption}
         setSortOption={setSortOption}
         sortCharacters={sortCharacters}
       />
+
       {isLoading && <LoaderComponent />}
+
       {!isLoading && count! > 0 && (
         <>
           <Box display="flex" flexWrap="wrap" justifyContent="center">
@@ -175,6 +180,7 @@ export default function Home() {
           {isMoreLoading && <LoaderComponent />}
         </>
       )}
+
       {!isLoading && count! === 0 && (
         <Box
           display="flex"
@@ -186,6 +192,7 @@ export default function Home() {
           <Typography variant="h6">No Results Match Your Search!</Typography>
         </Box>
       )}
+
       {visibleCount < count! && (
         <Box padding={2} paddingX={4}>
           <Button
@@ -193,7 +200,7 @@ export default function Home() {
             variant="contained"
             color="primary"
             sx={{ width: "100%" }}
-            disabled={isLoading}
+            disabled={isLoading || isMoreLoading}
           >
             Load More
           </Button>

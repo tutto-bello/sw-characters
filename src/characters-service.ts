@@ -23,7 +23,7 @@ export const searchCharacters = async (searchQuery: string) => {
   }
 };
 
-export const fetcNextPage = async (nextUrl: string) => {
+export const fetchNextPage = async (nextUrl: string) => {
   try {
     const response = await axios.get<FetchDataType>(nextUrl);
     return response.data;
