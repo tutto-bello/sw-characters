@@ -1,10 +1,14 @@
-# STAR WARS Charater serach
+# STAR WARS Charater search
 
 ## React - Frontend Coding Challenge for Prozenda
 
 ## Getting Started
 
-First, run the development server:
+First, add .env file and your API url:
+
+`NEXT_PUBLIC_API_URL="https://your.api.url"`
+
+Then run the development server:
 
 ```bash
 npm run dev
