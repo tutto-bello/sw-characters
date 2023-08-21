@@ -17,19 +17,28 @@ const CardComponent = (props: CardComponentProps) => {
   return (
     <Card
       sx={{
-        width: "100%",
-        margin: 2,
-        "@media (min-width: 768px)": {
+        width: "80%",
+        margin: 1,
+        "@media (min-width: 425px)": {
           width: "45%",
         },
+        "@media (min-width: 768px)": {
+          width: "25%",
+        },
         "@media (min-width: 1240px)": {
-          width: "22.2%",
+          width: "18%",
         },
       }}
     >
       <CardContent>
         <Box textAlign="center">
-          <Box position="relative" width="200px" height="212px" marginX="auto">
+          <Box
+            position="relative"
+            width="150px"
+            height="162px"
+            marginX="auto"
+            mb={1}
+          >
             <Image
               src={
                 index % 2 == 0
@@ -42,7 +51,7 @@ const CardComponent = (props: CardComponentProps) => {
               sizes="100%"
             />
           </Box>
-          <Typography variant="h6" component="div">
+          <Typography variant="body1" component="div">
             {name}
           </Typography>
         </Box>

@@ -1,19 +1,27 @@
 import React, { useEffect, useState } from "react";
-import { Box, Button, Typography } from "@mui/material";
+import { Box, Button, Skeleton, Typography } from "@mui/material";
 import CardComponent from "../component/card-component";
 import LayoutComponent from "../component/layout/layout-component";
 import LoaderComponent from "../component/loader-component";
 import SortComponent from "../component/sort-component";
 import SearchComponent from "../component/search-component";
-import { fetchData, searchCharacters } from "../characters-service";
+import {
+  fetcNextPage,
+  fetchData,
+  searchCharacters,
+} from "../characters-service";
 import { IPeople, SortTypeOptions } from "../types";
 
 export default function Home() {
   const [isLoading, setLoading] = useState(false);
+  const [isMoreLoading, setMoreLoading] = useState(false);
   const [characters, setCharacters] = useState<IPeople[]>([]);
-  const [sortedCharacters, setSortedCharacters] = useState<IPeople[]>([]);
+  // newSortedCharacters needed for sort Male and Female set, BUT it not a good scenario, the api don't handle gender search
+  const [newSortedCharacters, setSortedCharacters] = useState<IPeople[]>([]);
+  const [count, setCount] = useState<number>();
+  const [nextUrl, setNextUrl] = useState<string>();
   const [sortOption, setSortOption] = useState<SortTypeOptions>("");
-  const [visibleCount, setVisibleCount] = useState<number>(4);
+  const [visibleCount, setVisibleCount] = useState<number>(5);
   const [searchQuery, setSearchQuery] = useState<string>("");
 
   useEffect(() => {
@@ -23,39 +31,48 @@ export default function Home() {
         if (data) {
           setCharacters(data.results);
           setSortedCharacters(data.results);
+          setCount(data.count);
+          setNextUrl(data.next);
         }
       })
       .finally(() => setLoading(false));
   }, []);
 
   const sortCharacters = (option: SortTypeOptions) => {
-    let sortedCharacters: IPeople[] = [...characters];
+    let newSortedCharacters: IPeople[] = [...characters];
 
     if (option === "A-Z") {
-      sortedCharacters.sort((a, b) => a.name.localeCompare(b.name));
+      newSortedCharacters = newSortedCharacters.sort((a, b) =>
+        a.name.localeCompare(b.name)
+      );
     } else if (option === "Z-A") {
-      sortedCharacters.sort((a, b) => b.name.localeCompare(a.name));
+      newSortedCharacters = newSortedCharacters.sort((a, b) =>
+        b.name.localeCompare(a.name)
+      );
     } else if (option === "Male") {
-      sortedCharacters = characters.filter(
+      newSortedCharacters = characters.filter(
         (character) => character.gender === "male"
       );
     } else if (option === "Female") {
-      sortedCharacters = characters.filter(
+      newSortedCharacters = characters.filter(
         (character) => character.gender === "female"
       );
     }
-    setVisibleCount(sortedCharacters.length > 4 ? 4 : sortedCharacters.length);
-    setSortedCharacters(sortedCharacters);
+    setVisibleCount(Math.min(newSortedCharacters.length, count!));
+    setSortedCharacters(newSortedCharacters);
   };
 
   const handleSearch = async () => {
     setLoading(true);
+    setSortOption("");
     if (searchQuery.trim() === "") {
       fetchData().then((data) => {
         if (data) {
-          setVisibleCount(Math.min(data.results.length, 4));
+          setVisibleCount(Math.min(data.results.length, 5));
           setCharacters(data.results);
           setSortedCharacters(data.results);
+          setCount(data.count);
+          setNextUrl(data.next);
           setLoading(false);
         }
       });
@@ -64,9 +81,11 @@ export default function Home() {
     try {
       searchCharacters(searchQuery).then((data) => {
         if (data) {
-          setVisibleCount(Math.min(data.results.length, 4));
+          setVisibleCount(Math.min(data.results.length, 5));
           setCharacters(data.results);
           setSortedCharacters(data.results);
+          setCount(data.count);
+          setNextUrl(data.next);
           setLoading(false);
         }
       });
@@ -77,9 +96,34 @@ export default function Home() {
   };
 
   const handleLoadMore = () => {
-    setVisibleCount((prevVisibleCount) =>
-      Math.min(prevVisibleCount + 4, sortedCharacters.length)
-    );
+    setSortOption("");
+    if (count) {
+      setVisibleCount((prevVisibleCount) =>
+        Math.min(prevVisibleCount + 5, count)
+      );
+
+      if (count > 10 && nextUrl && visibleCount % 10 == 0) {
+        setMoreLoading(true);
+        fetcNextPage(nextUrl).then((data) => {
+          if (data) {
+            setCharacters((prevCharacters) => [
+              ...prevCharacters,
+              ...data.results,
+            ]);
+            setSortedCharacters((prevCharacters) => [
+              ...prevCharacters,
+              ...data.results,
+            ]);
+            setCount(data.count);
+            setNextUrl(data.next);
+            setVisibleCount((prevVisibleCount) =>
+              Math.min(prevVisibleCount, count)
+            );
+            setMoreLoading(false);
+          }
+        });
+      }
+    }
   };
 
   return (
@@ -90,9 +134,26 @@ export default function Home() {
         setSearchQuery={setSearchQuery}
         handleSearch={handleSearch}
       />
-      <Typography color="white" variant="h6" padding={2}>
-        {`Showing ${visibleCount} result of ${sortedCharacters.length}`}
-      </Typography>
+      {isLoading && (
+        <Box paddingLeft={2}>
+          <Skeleton height={64} width={240} />
+        </Box>
+      )}
+      {count! > 0 && !isLoading && (
+        <Typography color="white" variant="h6" padding={2}>
+          {`Showing ${visibleCount} result of ${
+            // api does not handle gender search, so we do no know the count of sort
+            sortOption === "Male" || sortOption === "Female"
+              ? "Unknown quantity"
+              : count
+          }`}
+        </Typography>
+      )}
+      {count === 0 && !isLoading && (
+        <Typography color="white" variant="h6" padding={2}>
+          Showing 0 result of 0
+        </Typography>
+      )}
       <SortComponent
         characters={characters}
         sortOption={sortOption}
@@ -100,24 +161,33 @@ export default function Home() {
         sortCharacters={sortCharacters}
       />
       {isLoading && <LoaderComponent />}
-      {!isLoading && sortedCharacters.length > 0 && (
-        <Box display="flex" flexWrap="wrap" justifyContent="center">
-          {sortedCharacters.slice(0, visibleCount).map((character, i) => (
-            <CardComponent
-              key={character.name}
-              character={character}
-              index={i}
-            />
-          ))}
-        </Box>
+      {!isLoading && count! > 0 && (
+        <>
+          <Box display="flex" flexWrap="wrap" justifyContent="center">
+            {newSortedCharacters.slice(0, visibleCount).map((character, i) => (
+              <CardComponent
+                key={character.name}
+                character={character}
+                index={i}
+              />
+            ))}
+          </Box>
+          {isMoreLoading && <LoaderComponent />}
+        </>
       )}
-      {!isLoading && sortedCharacters.length === 0 && (
-        <Box display="flex" flexWrap="wrap" justifyContent="center">
+      {!isLoading && count! === 0 && (
+        <Box
+          display="flex"
+          flexWrap="wrap"
+          justifyContent="center"
+          height={240}
+          alignItems="center"
+        >
           <Typography variant="h6">No Results Match Your Search!</Typography>
         </Box>
       )}
-      {visibleCount < sortedCharacters.length && (
-        <Box padding={2}>
+      {visibleCount < count! && (
+        <Box padding={2} paddingX={4}>
           <Button
             onClick={handleLoadMore}
             variant="contained"

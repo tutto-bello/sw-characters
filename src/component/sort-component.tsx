@@ -1,11 +1,4 @@
-import {
-  Box,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  SelectChangeEvent,
-} from "@mui/material";
+import { Box, Select, MenuItem, SelectChangeEvent } from "@mui/material";
 import React, { SetStateAction } from "react";
 import { IPeople, SortTypeOptions, sortOptions } from "../types";
 
@@ -28,8 +21,6 @@ const SortComponent = (props: SortComponentProps) => {
 
   return (
     <Box padding={2}>
-      {/* <FormControl disabled={characters.length < 2} variant="standard">
-        <InputLabel>Sort by</InputLabel> */}
       <Select
         value={sortOption}
         onChange={handleSortChange}
@@ -48,7 +39,6 @@ const SortComponent = (props: SortComponentProps) => {
           </MenuItem>
         ))}
       </Select>
-      {/* </FormControl> */}
     </Box>
   );
 };

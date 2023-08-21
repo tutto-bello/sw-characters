@@ -5,19 +5,22 @@ import { Skeleton } from "@mui/material";
 const LoaderComponent = () => {
   return (
     <Box display="flex" flexWrap="wrap" justifyContent="center">
-      {[1, 2, 3, 4].map((number) => (
+      {[1, 2, 3, 4, 5].map((number) => (
         <Skeleton
           key={number}
           variant="rounded"
           sx={{
-            width: "100%",
-            height: "284px",
-            margin: 2,
-            "@media (min-width: 768px)": {
+            height: "234px",
+            width: "80%",
+            margin: 1,
+            "@media (min-width: 425px)": {
               width: "45%",
             },
+            "@media (min-width: 768px)": {
+              width: "25%",
+            },
             "@media (min-width: 1240px)": {
-              width: "22.2%",
+              width: "18%",
             },
           }}
         />

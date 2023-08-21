@@ -22,3 +22,12 @@ export const searchCharacters = async (searchQuery: string) => {
     console.error("Error searching data:", error);
   }
 };
+
+export const fetcNextPage = async (nextUrl: string) => {
+  try {
+    const response = await axios.get<FetchDataType>(nextUrl);
+    return response.data;
+  } catch (error) {
+    console.error("Error searching data:", error);
+  }
+};
